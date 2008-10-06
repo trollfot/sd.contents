@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
-from sd import _
+
 from zope.schema import Choice, Bool, Int
 from zope.interface import Interface, Attribute
+from zope.i18nmessageid import MessageFactory
 from zope.annotation.interfaces import IAttributeAnnotatable
 from Products.ATContentTypes.interface.interfaces import IATContentType
+
+_ = MessageFactory("sd")
 
 
 # Basic markers
