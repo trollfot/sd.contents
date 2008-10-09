@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 from zope.interface import implements
 from AccessControl import ClassSecurityInfo
 from Products.CMFCore.permissions import View
@@ -6,12 +7,11 @@ from Products.CMFCore.utils import getToolByName
 from Products.ATContentTypes.lib.autosort import AutoOrderSupport
 from Products.ATContentTypes.content.base import ATCTOrderedFolder
 from Products.ATContentTypes.content.folder  import ATFolderSchema
-from Products.Archetypes.AllowedTypesByIface import AllowedTypesByIfaceMixin
+from Products.Archetypes.ArchetypeTool import listTypes
 from interfaces import IStructuredContainer
 
 
-class StructuredContainer( AllowedTypesByIfaceMixin,
-                           AutoOrderSupport, ATCTOrderedFolder ):
+class StructuredContainer(AutoOrderSupport, ATCTOrderedFolder):
     """Base container, implemented by a document and a chapter
     """
     implements(IStructuredContainer)
@@ -26,6 +26,20 @@ class StructuredContainer( AllowedTypesByIfaceMixin,
         return False
 
 
+    security.declarePublic('listTypeInfo')
+    def listTypeInfo(self, ifaces):
+        pt = getToolByName(self, 'portal_types')
+        value = []
+        for data in listTypes():
+            klass = data['klass']
+            for iface in ifaces:
+                if iface.implementedBy(klass):
+                    ti = pt.getTypeInfo(data['portal_type'])
+                    if ti is not None:
+                        value.append(ti)
+        return value
+
+
     security.declarePublic('getDefaultAddableTypes')
     def getDefaultAddableTypes(self, context=None):
         """Returns a list of normally allowed objects as ftis.
@@ -35,13 +49,11 @@ class StructuredContainer( AllowedTypesByIfaceMixin,
         if context is None:
             context = self
 
-        pt = getToolByName(self, 'portal_types')
-        at = getToolByName(self, 'archetype_tool')
-        
-        allow   = at.listPortalTypesWithInterfaces(self.allowed_interfaces)
+        pt      = getToolByName(self, 'portal_types')        
+        allow   = self.listTypeInfo(self.allowed_interfaces)
         allowed = [item.getId() for item in allow]
-        result  = [ contentType for contentType in pt.listTypeInfo(context)
-                    if contentType.getId() in allowed]
+        result  = [contentType for contentType in pt.listTypeInfo(context)
+                   if contentType.getId() in allowed]
 
         return [t for t in result if t.isConstructionAllowed(context)]
 
@@ -51,8 +63,3 @@ class StructuredContainer( AllowedTypesByIfaceMixin,
         """We disable the next-previous inheritage.
         """
         return False
-        
-
-    def manage_afterAdd(self, item, container):
-        ATCTOrderedFolder.manage_afterAdd(self, item, container)
-        AutoOrderSupport.manage_afterAdd(self, item, container)
