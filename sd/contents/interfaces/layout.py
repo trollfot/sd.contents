@@ -31,8 +31,8 @@ class IDynamicStructuredItem(IStructuredItem):
     sd_layout = Choice(
         required=True,
         title=_(u"Layout"),
-        vocabulary="sd.rendering.layout",
         default=u"default",
+        vocabulary="sd.rendering.layout",
         description=_(u"sd_layout_desc",
                       default=u"Layout used to render the item."),
         )
