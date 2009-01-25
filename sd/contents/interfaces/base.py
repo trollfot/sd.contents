@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from zope.interface import Interface
+from plone.portlets.interfaces import ILocalPortletAssignable
 
 
 class IStructuredItem(Interface):
@@ -11,7 +12,7 @@ class IStructuredContainer(IStructuredItem):
     """Marker interface
     """
 
-class IStructuredDocument(IStructuredContainer):
+class IStructuredDocument(IStructuredContainer, ILocalPortletAssignable):
     """Marker interface
     """
 
