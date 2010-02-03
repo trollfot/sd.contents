@@ -23,7 +23,11 @@ setup(name = name,
       platforms = 'Any',
       zip_safe = False,
       install_requires=[
+          'plone.portlets',
           'setuptools',
+          'zope.i18nmessageid',
+          'zope.interface',
+          'zope.schema',
       ],
       classifiers = [
         'Development Status :: 4 - Beta',
